@@ -544,6 +544,12 @@ select:focus {
   margin-bottom: 6px;
 }
 
+.summary-card__hint {
+  font-size: 0.68rem;
+  color: var(--c-muted);
+  margin: -4px 0 6px;
+}
+
 .summary-card__value {
   font-size: 1.15rem;
   font-weight: 700;

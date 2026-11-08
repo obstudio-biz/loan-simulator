@@ -76,16 +76,6 @@
     return rows;
   }
 
-  function payoffLabel(summary, input) {
-    const F = global.LoanFormat;
-    const duration = F.formatMonthsToYM(summary.payoffMonth);
-    if (input.startMonth) {
-      const cal = F.formatCalendarMonth(input.startMonth, summary.payoffMonth || 0);
-      return cal ? `${duration}（${cal}）` : duration;
-    }
-    return duration;
-  }
-
   function monthlyPaymentLabel(input) {
     const isEqualPayment = input.repaymentType !== "equalPrincipal";
     if (!isEqualPayment || input.hasPaymentVariability) return "毎月の返済額（初回）";
@@ -98,8 +88,10 @@
       [monthlyPaymentLabel(input), F.formatYen(summary.firstPayment)],
       ["総返済額", F.formatYen(summary.totalPayment)],
       ["総利息", F.formatYen(summary.totalInterest)],
-      ["完済", payoffLabel(summary, input)],
     ];
+    if (input && input.grossYield != null) {
+      items.push(["表面利回り", F.formatPercent(input.grossYield)]);
+    }
     if (input && input.repaymentRatio != null) {
       items.push(["返済比率", F.formatRatio(input.repaymentRatio)]);
     }

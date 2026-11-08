@@ -221,28 +221,35 @@
     return (annualPaymentFromSummary(summary) / annualRent) * 100;
   }
 
+  // 表面利回り = 月額家賃収入 × 12 ÷ 取得費用（物件価格 + リフォーム費用）
+  function grossYield(state) {
+    if (!(state.monthlyRent > 0)) return null;
+    const acquisitionCost = acquisitionCostFrom(state);
+    if (!(acquisitionCost > 0)) return null;
+    const annualRent = state.monthlyRent * 12;
+    return (annualRent / acquisitionCost) * 100;
+  }
+
   // ---------------- 描画 ----------------
   function renderSummary(state, calcInput, result) {
     const { summary } = result;
     const isEqualPayment = state.repaymentType === "equalPayment";
     // 金利変更イベントや繰り上げ返済があると、元利均等でも返済額が途中で変わるため「初回」を明示する
     const hasVariability = calcInput.rateChanges.length > 0 || calcInput.prepayments.some((p) => p.type === "reducePayment");
-    const payoffLabel = state.startMonth
-      ? F.formatCalendarMonth(state.startMonth, summary.payoffMonth || 0) || "-"
-      : summary.payoffMonth
-      ? `${summary.payoffMonth}回目`
-      : "-";
 
     const cards = [
       { label: "借入金額", value: F.formatYen(calcInput.principal) },
       { label: isEqualPayment && !hasVariability ? "毎月の返済額" : "毎月の返済額（初回）", value: F.formatYen(summary.firstPayment) },
       { label: "総返済額", value: F.formatYen(summary.totalPayment) },
       { label: "総利息", value: F.formatYen(summary.totalInterest) },
-      { label: "完済までの期間", value: F.formatMonthsToYM(summary.payoffMonth) },
-      { label: "完済予定", value: payoffLabel },
+      { label: "完済までの期間", value: summary.payoffMonth ? `${F.formatMonthsToYM(summary.payoffMonth)}　・${summary.payoffMonth}回` : "-" },
     ];
     if (!isEqualPayment || hasVariability) {
       cards.splice(2, 0, { label: "毎月の返済額（最終回）", value: F.formatYen(summary.lastPayment) });
+    }
+    const yieldPct = grossYield(state);
+    if (yieldPct != null) {
+      cards.push({ label: "表面利回り", hint: "年額家賃 ÷ 取得費用", value: F.formatPercent(yieldPct) });
     }
     const ratio = repaymentRatio(summary, state.monthlyRent);
     if (ratio != null) {
@@ -254,6 +261,7 @@
         (c) => `
         <div class="summary-card">
           <div class="summary-card__label">${c.label}</div>
+          ${c.hint ? `<div class="summary-card__hint">${c.hint}</div>` : ""}
           <div class="summary-card__value">${c.value}</div>
         </div>
       `
@@ -380,6 +388,7 @@
       startMonth: state.startMonth,
       monthlyRent: state.monthlyRent,
       repaymentRatio: repaymentRatio(latestResult.summary, state.monthlyRent),
+      grossYield: grossYield(state),
       scenarioDelta1: state.scenarioDelta1,
       scenarioDelta2: state.scenarioDelta2,
       scenarioDelta3: state.scenarioDelta3,
