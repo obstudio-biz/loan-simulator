@@ -453,6 +453,8 @@
       }
     });
 
+    el("resetToDefaults").addEventListener("click", resetFormToDefaults);
+
     el("exportPdf").addEventListener("click", async () => {
       const btn = el("exportPdf");
       const original = btn.textContent;
@@ -469,6 +471,46 @@
         btn.textContent = original;
       }
     });
+  }
+
+  function resetFormToDefaults() {
+    const ids = [
+      "propertyPrice",
+      "renovationCost",
+      "ownFunds",
+      "annualRate",
+      "startMonth",
+      "termYears",
+      "termMonthsExtra",
+      "graceMonths",
+      "graceRate",
+      "scenarioDelta1",
+      "scenarioDelta2",
+      "monthlyRent",
+    ];
+    ids.forEach((id) => {
+      const input = el(id);
+      input.value = input.defaultValue;
+    });
+    document.querySelectorAll('input[name="repaymentType"]').forEach((r) => {
+      r.checked = r.defaultChecked;
+    });
+    rateChangeRows = [];
+    prepaymentRows = [];
+    renderRateChangeList();
+    renderPrepaymentList();
+    document.querySelectorAll("details.card--collapsible").forEach((d) => {
+      d.open = false;
+    });
+    const toggle = el("toggleAllYears");
+    if (toggle) toggle.textContent = "すべて展開";
+    if (window.location.search) {
+      const url = new URL(window.location.href);
+      url.search = "";
+      history.replaceState(null, "", url.pathname + url.hash);
+    }
+    recalcAndRender();
+    showStatus("入力を初期状態に戻しました。");
   }
 
   function showStatus(text) {
