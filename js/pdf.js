@@ -564,13 +564,36 @@
     }
   }
 
+  function formatManYenForFilename(amount) {
+    const yen = Math.round(Number(amount) || 0);
+    const man = yen / 10000;
+    const display = Number.isInteger(man) ? man : Math.round(man * 10) / 10;
+    return `${display.toLocaleString("ja-JP")}万`;
+  }
+
+  function formatRateForFilename(rate) {
+    const n = Number(rate);
+    if (Number.isNaN(n)) return "-";
+    const trimmed = String(n).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+    return `${trimmed}%`;
+  }
+
+  function buildPdfFilename(input) {
+    const F = global.LoanFormat;
+    const amount = formatManYenForFilename(input && input.principal);
+    const term = F.formatMonthsToYM(Number(input && input.termMonths) || 0);
+    const rate = formatRateForFilename(input && input.annualRate);
+    const safe = (s) => String(s).replace(/[\\/:*?"<>|]/g, "-");
+    return `バナローン_${safe(amount)}_${safe(term)}_${safe(rate)}.pdf`;
+  }
+
   async function exportSchedulePdf(args) {
     if (!global.jspdf || !global.html2canvas) {
       alert("PDF出力に必要なライブラリの読み込みに失敗しました。インターネット接続をご確認のうえ、再読み込みしてください。");
       return;
     }
     const { doc } = await createSchedulePdf(args);
-    doc.save("償還表.pdf");
+    doc.save(buildPdfFilename(args && args.input));
   }
 
   global.LoanPdf = {
