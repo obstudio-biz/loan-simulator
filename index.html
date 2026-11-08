@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ローンシミュレーター | 事業融資返済プラン</title>
+<meta name="description" content="事業融資向けのローン返済シミュレーター。元利均等・元金均等、据置期間、繰り上げ返済、金利変更に対応し、償還表をPDFで出力できます。" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="app-header">
+  <div class="app-header__inner">
+    <h1 class="app-header__title">ローンシミュレーター</h1>
+    <p class="app-header__subtitle">事業融資の返済プランを、スマホでもPCでも簡単に試算</p>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- ============ 入力パネル ============ -->
+  <section class="panel panel--input" aria-label="入力条件">
+
+    <div class="card">
+      <h2 class="card__title">基本条件</h2>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field__label">物件価格（円）</span>
+          <input type="number" id="propertyPrice" inputmode="numeric" min="0" step="10000" value="30000000" />
+        </label>
+        <label class="field">
+          <span class="field__label">自己資金（円）</span>
+          <input type="number" id="ownFunds" inputmode="numeric" min="0" step="10000" value="0" />
+        </label>
+      </div>
+
+      <div class="loan-amount-readout" id="loanAmountReadout">
+        <div class="loan-amount-readout__text">
+          <span class="loan-amount-readout__label">借入金額</span>
+          <span class="loan-amount-readout__formula">物件価格 − 自己資金</span>
+        </div>
+        <span class="loan-amount-readout__value" id="loanAmountReadoutValue">30,000,000円</span>
+      </div>
+      <p id="loanAmountWarning" class="field-warning" hidden>自己資金が物件価格を超えているため、借入金額は0円です。</p>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field__label">年利（%）</span>
+          <input type="number" id="annualRate" inputmode="decimal" min="0" step="0.01" value="1.50" />
+        </label>
+        <label class="field">
+          <span class="field__label">借入開始年月（任意）</span>
+          <input type="month" id="startMonth" />
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field__label">返済期間（年）</span>
+          <input type="number" id="termYears" inputmode="numeric" min="0" step="1" value="30" />
+        </label>
+        <label class="field">
+          <span class="field__label">返済期間（月・端数）</span>
+          <input type="number" id="termMonthsExtra" inputmode="numeric" min="0" max="11" step="1" value="0" />
+        </label>
+      </div>
+
+      <div class="field">
+        <span class="field__label">返済方式</span>
+        <div class="segmented" role="radiogroup" aria-label="返済方式">
+          <label class="segmented__option">
+            <input type="radio" name="repaymentType" value="equalPayment" checked />
+            <span>元利均等返済</span>
+          </label>
+          <label class="segmented__option">
+            <input type="radio" name="repaymentType" value="equalPrincipal" />
+            <span>元金均等返済</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <details class="card card--collapsible">
+      <summary class="card__title">元金据置期間（任意）</summary>
+      <p class="card__hint">建築中など、元金を返済せず利息のみを支払う期間を設定できます。</p>
+      <div class="field-row">
+        <label class="field">
+          <span class="field__label">据置期間（月）</span>
+          <input type="number" id="graceMonths" inputmode="numeric" min="0" step="1" value="0" />
+        </label>
+        <label class="field">
+          <span class="field__label">据置中の年利（%・空欄で基本金利と同じ）</span>
+          <input type="number" id="graceRate" inputmode="decimal" min="0" step="0.01" placeholder="基本金利と同じ" />
+        </label>
+      </div>
+    </details>
+
+    <details class="card card--collapsible">
+      <summary class="card__title">金利変更イベント（任意）</summary>
+      <p class="card__hint">「〇ヶ月目から金利が変わる」というシナリオを追加して、金利上昇時の影響を確認できます。</p>
+      <div id="rateChangeList" class="dynamic-list"></div>
+      <button type="button" id="addRateChange" class="btn btn--ghost">＋ 金利変更を追加</button>
+    </details>
+
+    <details class="card card--collapsible">
+      <summary class="card__title">繰り上げ返済（任意）</summary>
+      <p class="card__hint">実行する月・金額・種別を指定してください。複数登録できます。</p>
+      <div id="prepaymentList" class="dynamic-list"></div>
+      <button type="button" id="addPrepayment" class="btn btn--ghost">＋ 繰り上げ返済を追加</button>
+    </details>
+
+    <div class="action-row">
+      <button type="button" id="copyShareLink" class="btn btn--secondary">共有用リンクをコピー</button>
+      <button type="button" id="exportPdf" class="btn btn--primary">償還表をPDFで保存</button>
+    </div>
+    <p id="shareStatus" class="status-text" role="status" aria-live="polite"></p>
+  </section>
+
+  <!-- ============ 結果パネル ============ -->
+  <section class="panel panel--result" aria-label="計算結果">
+
+    <div class="summary-grid" id="summaryGrid">
+      <!-- JSで生成 -->
+    </div>
+
+    <div class="card">
+      <h2 class="card__title">金利上昇シナリオ比較</h2>
+      <p class="card__hint">現在の入力条件をベースに、金利が上昇した場合の影響を比較します。</p>
+      <div class="field-row field-row--compact">
+        <label class="field">
+          <span class="field__label">比較シナリオ1（現在の金利 + %）</span>
+          <input type="number" id="scenarioDelta1" inputmode="decimal" min="0" step="0.1" value="1.0" />
+        </label>
+        <label class="field">
+          <span class="field__label">比較シナリオ2（現在の金利 + %）</span>
+          <input type="number" id="scenarioDelta2" inputmode="decimal" min="0" step="0.1" value="2.0" />
+        </label>
+      </div>
+      <div class="table-scroll">
+        <table class="scenario-table" id="scenarioTable">
+          <thead>
+            <tr>
+              <th>シナリオ</th>
+              <th>年利</th>
+              <th>毎月返済額（初回）</th>
+              <th>総返済額</th>
+              <th>総利息</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card__title">残高推移グラフ</h2>
+      <div class="chart-wrap">
+        <canvas id="balanceChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card__title">年間の元金・利息内訳</h2>
+      <div class="chart-wrap">
+        <canvas id="breakdownChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__title-row">
+        <h2 class="card__title">償還表</h2>
+        <button type="button" id="toggleAllYears" class="btn btn--ghost btn--small">すべて展開</button>
+      </div>
+      <div id="scheduleTable"></div>
+    </div>
+
+  </section>
+</main>
+
+<footer class="app-footer">
+  <p>本ツールの試算結果は概算です。実際の金融機関の計算・契約条件とは異なる場合があります。</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/format.js"></script>
+<script src="js/share.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/pdf.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

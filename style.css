@@ -1,0 +1,639 @@
+/* ==========================================================
+   ローンシミュレーター スタイル
+   OfficeBanana デザイン標準のカラーパレットを踏襲
+   ========================================================== */
+
+:root {
+  --c-title-bg: #4a4f52;
+  --c-title-fg: #ffffff;
+  --c-header-bg: #4a4f52;
+  --c-header-fg: #ffffff;
+  --c-item-bg: #e8e3d8;
+  --c-input-bg: #fafaf7;
+  --c-calc-bg: #fafaf7;
+  --c-accent: #b08d57;
+  --c-border: #b8b2a7;
+  --c-text: #1f1f1f;
+  --c-subhdr-bg: #e8e3d8;
+  --c-total-bg: #e8e3d8;
+  --c-muted: #888888;
+  --c-bg: #f4f2ee;
+  --c-danger: #a8433a;
+
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(31, 31, 31, 0.08), 0 1px 2px rgba(31, 31, 31, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+  line-height: 1.55;
+}
+
+h1, h2, h3 {
+  margin: 0;
+}
+
+/* ---------------- Header ---------------- */
+.app-header {
+  background: var(--c-title-bg);
+  color: var(--c-title-fg);
+  padding: 20px 16px;
+}
+
+.app-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.app-header__subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+/* ---------------- Layout ---------------- */
+.layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 960px) {
+  .layout {
+    grid-template-columns: 380px 1fr;
+    align-items: start;
+    padding: 24px;
+    gap: 24px;
+  }
+  .panel--input {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------------- Card ---------------- */
+.card {
+  background: #ffffff;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.card--collapsible summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.card--collapsible summary::-webkit-details-marker {
+  display: none;
+}
+
+.card--collapsible summary::after {
+  content: "▼";
+  float: right;
+  font-size: 0.7rem;
+  color: var(--c-muted);
+  transform: rotate(-90deg);
+  transition: transform 0.15s ease;
+}
+
+.card--collapsible[open] summary::after {
+  transform: rotate(0deg);
+}
+
+.card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--c-text);
+  padding-bottom: 4px;
+}
+
+.card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card__title-row .card__title {
+  padding-bottom: 0;
+}
+
+.card__hint {
+  font-size: 0.8rem;
+  color: var(--c-muted);
+  margin: 4px 0 12px;
+}
+
+/* ---------------- Form fields ---------------- */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.field-row--compact {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 480px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.field-row .field {
+  margin-bottom: 0;
+}
+
+.field__label {
+  font-size: 0.78rem;
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+input[type="number"],
+input[type="text"],
+input[type="month"],
+select {
+  background: var(--c-input-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: 0.95rem;
+  color: var(--c-text);
+  width: 100%;
+  font-family: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 2px rgba(176, 141, 87, 0.25);
+}
+
+/* ---------------- 借入金額の自動計算表示 ---------------- */
+.loan-amount-readout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  background: var(--c-item-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.loan-amount-readout__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.loan-amount-readout__label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.loan-amount-readout__formula {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--c-muted);
+}
+
+.loan-amount-readout__value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--c-accent);
+}
+
+.field-warning {
+  font-size: 0.78rem;
+  color: var(--c-danger);
+  margin: -4px 0 12px;
+}
+
+/* ---------------- Segmented control ---------------- */
+.segmented {
+  display: flex;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.segmented__option {
+  flex: 1;
+  text-align: center;
+  padding: 9px 6px;
+  font-size: 0.85rem;
+  background: var(--c-input-bg);
+  cursor: pointer;
+  border-right: 1px solid var(--c-border);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented__option:last-child {
+  border-right: none;
+}
+
+.segmented__option input {
+  display: none;
+}
+
+.segmented__option:has(input:checked) {
+  background: var(--c-header-bg);
+  color: var(--c-header-fg);
+  font-weight: 700;
+}
+
+/* ---------------- Buttons ---------------- */
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn--primary {
+  background: var(--c-accent);
+  color: #ffffff;
+}
+
+.btn--secondary {
+  background: var(--c-header-bg);
+  color: var(--c-header-fg);
+}
+
+.btn--ghost {
+  background: var(--c-item-bg);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+}
+
+.btn--small {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.btn--danger {
+  background: transparent;
+  color: var(--c-danger);
+  border: 1px solid var(--c-danger);
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.action-row .btn {
+  flex: 1;
+  min-width: 160px;
+}
+
+.status-text {
+  font-size: 0.8rem;
+  color: var(--c-accent);
+  min-height: 1.2em;
+  margin: 8px 0 0;
+}
+
+/* ---------------- Dynamic lists (rate changes / prepayments) ---------------- */
+.dynamic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.dynamic-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: end;
+  background: var(--c-item-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.dynamic-row--triple {
+  grid-template-columns: 1fr 1fr 1fr auto;
+}
+
+@media (max-width: 480px) {
+  .dynamic-row,
+  .dynamic-row--triple {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dynamic-row .btn--danger,
+  .dynamic-row--triple .btn--danger {
+    grid-column: 1 / -1;
+  }
+}
+
+.dynamic-row .field {
+  margin-bottom: 0;
+}
+
+.dynamic-row select {
+  background: var(--c-input-bg);
+}
+
+.empty-hint {
+  font-size: 0.8rem;
+  color: var(--c-muted);
+  padding: 4px 2px;
+}
+
+/* ---------------- Summary cards ---------------- */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  text-align: center;
+}
+
+.summary-card__label {
+  font-size: 0.72rem;
+  color: var(--c-muted);
+  margin-bottom: 6px;
+}
+
+.summary-card__value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--c-accent);
+  word-break: break-word;
+}
+
+.summary-card__value--small {
+  font-size: 0.95rem;
+}
+
+/* ---------------- Scenario comparison table ---------------- */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.scenario-table,
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 480px;
+}
+
+.scenario-table th,
+.scenario-table td,
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid var(--c-border);
+  padding: 7px 8px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.scenario-table th:first-child,
+.scenario-table td:first-child,
+.schedule-table th:first-child,
+.schedule-table td:first-child {
+  text-align: left;
+}
+
+.scenario-table thead th,
+.schedule-table thead th {
+  background: var(--c-header-bg);
+  color: var(--c-header-fg);
+  font-weight: 700;
+}
+
+.scenario-table tbody tr:nth-child(1) td {
+  font-weight: 700;
+}
+
+.schedule-table tbody tr.row--grace {
+  background: var(--c-subhdr-bg);
+}
+
+.schedule-table tbody tr.row--prepay td {
+  color: var(--c-accent);
+  font-weight: 700;
+}
+
+/* ---------------- Schedule (year groups) ---------------- */
+.year-group {
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.year-group summary {
+  cursor: pointer;
+  list-style: none;
+  background: var(--c-item-bg);
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.year-group summary::-webkit-details-marker {
+  display: none;
+}
+
+.year-group summary .year-group__sub {
+  color: var(--c-muted);
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+
+/* ---------------- Chart ---------------- */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* ---------------- PDF出力用（html2canvasでスナップショットするオフスクリーン要素） ---------------- */
+.pdf-doc {
+  padding: 28px;
+  color: var(--c-text);
+  font-family: "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+.pdf-doc__title {
+  background: var(--c-title-bg);
+  color: var(--c-title-fg);
+  padding: 14px 18px;
+  border-radius: 6px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.pdf-doc__subtitle {
+  font-size: 12px;
+  color: var(--c-muted);
+  margin-bottom: 18px;
+}
+
+.pdf-doc__section-title {
+  background: var(--c-header-bg);
+  color: var(--c-header-fg);
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 4px;
+  margin: 18px 0 10px;
+}
+
+.pdf-condition-table,
+.pdf-schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.pdf-condition-table td {
+  border: 1px solid var(--c-border);
+  padding: 8px 10px;
+}
+
+.pdf-condition-table td.label {
+  background: var(--c-item-bg);
+  font-weight: 700;
+  width: 32%;
+}
+
+.pdf-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.pdf-summary-item {
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+
+.pdf-summary-item .label {
+  font-size: 11px;
+  color: var(--c-muted);
+  margin-bottom: 4px;
+}
+
+.pdf-summary-item .value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-accent);
+}
+
+.pdf-schedule-table th,
+.pdf-schedule-table td {
+  border: 1px solid var(--c-border);
+  padding: 5px 7px;
+  text-align: right;
+}
+
+.pdf-schedule-table th:first-child,
+.pdf-schedule-table td:first-child {
+  text-align: center;
+}
+
+.pdf-schedule-table thead th {
+  background: var(--c-header-bg);
+  color: var(--c-header-fg);
+}
+
+.pdf-schedule-table tbody tr.row--grace {
+  background: var(--c-subhdr-bg);
+}
+
+.pdf-schedule-table tbody tr.row--prepay td {
+  color: var(--c-accent);
+  font-weight: 700;
+}
+
+.pdf-doc__footer {
+  margin-top: 16px;
+  font-size: 10px;
+  color: var(--c-muted);
+}
+
+/* ---------------- Footer ---------------- */
+.app-footer {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--c-muted);
+  padding: 20px 16px 32px;
+}
