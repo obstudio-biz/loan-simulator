@@ -14,6 +14,11 @@
     return `${Number(v).toFixed(2)}%`;
   }
 
+  function formatRatio(v) {
+    if (v === null || v === undefined || Number.isNaN(v)) return "-";
+    return `${Number(v).toFixed(1)}%`;
+  }
+
   function formatMonthsToYM(months) {
     if (!(months >= 0)) return "-";
     const y = Math.floor(months / 12);
@@ -40,6 +45,7 @@
   global.LoanFormat = {
     formatYen,
     formatPercent,
+    formatRatio,
     formatMonthsToYM,
     formatCalendarMonth,
   };

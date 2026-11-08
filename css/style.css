@@ -1,5 +1,5 @@
 /* ==========================================================
-   ローンシミュレーター スタイル
+   バナローン スタイル
    OfficeBanana デザイン標準のカラーパレットを踏襲
    ========================================================== */
 
@@ -47,9 +47,10 @@ h1, h2, h3 {
 
 /* ---------------- Header ---------------- */
 .app-header {
-  background: var(--c-title-bg);
-  color: var(--c-title-fg);
-  padding: 20px 16px;
+  background: #ffffff;
+  color: var(--c-text);
+  padding: 14px 16px 16px;
+  border-bottom: 1px solid var(--c-border);
 }
 
 .app-header__inner {
@@ -58,14 +59,33 @@ h1, h2, h3 {
 }
 
 .app-header__title {
-  font-size: 1.4rem;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.app-header__logo {
+  display: block;
+  height: 56px;
+  width: auto;
+  max-width: min(360px, 88vw);
+  object-fit: contain;
 }
 
 .app-header__subtitle {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   font-size: 0.85rem;
-  opacity: 0.85;
+  color: var(--c-muted);
+}
+
+@media (min-width: 960px) {
+  .app-header {
+    padding: 18px 24px 20px;
+  }
+  .app-header__logo {
+    height: 72px;
+    max-width: 460px;
+  }
 }
 
 /* ---------------- Layout ---------------- */
@@ -155,7 +175,7 @@ h1, h2, h3 {
 /* ---------------- Form fields ---------------- */
 .field-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-bottom: 12px;
 }
@@ -164,9 +184,16 @@ h1, h2, h3 {
   margin-bottom: 8px;
 }
 
-@media (max-width: 480px) {
-  .field-row {
-    grid-template-columns: 1fr;
+/* 結果パネルは幅があるPCのみ2列。入力パネルは常に1列（380pxサイドバーでもラベルが欠けない） */
+@media (min-width: 960px) {
+  .panel--result .field-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 959px) {
+  .field__label {
+    font-size: 0.9rem;
   }
 }
 
@@ -175,6 +202,7 @@ h1, h2, h3 {
   flex-direction: column;
   gap: 4px;
   margin-bottom: 12px;
+  min-width: 0;
 }
 
 .field-row .field {
@@ -182,9 +210,20 @@ h1, h2, h3 {
 }
 
 .field__label {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--c-text);
   font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.field__unit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--c-muted);
+  flex-shrink: 0;
 }
 
 input[type="number"],
@@ -194,11 +233,12 @@ select {
   background: var(--c-input-bg);
   border: 1px solid var(--c-border);
   border-radius: 6px;
-  padding: 9px 10px;
-  font-size: 0.95rem;
+  padding: 12px 12px;
+  font-size: 1rem;
   color: var(--c-text);
   width: 100%;
   font-family: inherit;
+  min-height: 48px;
 }
 
 input:focus,
@@ -211,15 +251,26 @@ select:focus {
 /* ---------------- 借入金額の自動計算表示 ---------------- */
 .loan-amount-readout {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 12px;
+  flex-direction: column;
+  gap: 10px;
   background: var(--c-item-bg);
   border: 1px solid var(--c-border);
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 12px;
+}
+
+.loan-amount-readout__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.loan-amount-readout__row + .loan-amount-readout__row {
+  padding-top: 10px;
+  border-top: 1px solid var(--c-border);
 }
 
 .loan-amount-readout__text {
@@ -263,8 +314,12 @@ select:focus {
 .segmented__option {
   flex: 1;
   text-align: center;
-  padding: 9px 6px;
-  font-size: 0.85rem;
+  padding: 14px 6px;
+  font-size: 0.9rem;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--c-input-bg);
   cursor: pointer;
   border-right: 1px solid var(--c-border);
@@ -289,8 +344,9 @@ select:focus {
 .btn {
   border: none;
   border-radius: 8px;
-  padding: 11px 16px;
-  font-size: 0.9rem;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  min-height: 48px;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
@@ -320,6 +376,7 @@ select:focus {
 .btn--small {
   padding: 6px 10px;
   font-size: 0.78rem;
+  min-height: 32px;
 }
 
 .btn--danger {
@@ -371,14 +428,15 @@ select:focus {
   grid-template-columns: 1fr 1fr 1fr auto;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 959px) {
   .dynamic-row,
   .dynamic-row--triple {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
   .dynamic-row .btn--danger,
   .dynamic-row--triple .btn--danger {
     grid-column: 1 / -1;
+    min-height: 44px;
   }
 }
 
@@ -401,6 +459,23 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+}
+
+.summary-grid.summary-grid--result {
+  display: none;
+}
+
+.summary-grid.summary-grid--near-input {
+  margin-top: 0;
+}
+
+@media (min-width: 960px) {
+  .summary-grid.summary-grid--near-input {
+    display: none;
+  }
+  .summary-grid.summary-grid--result {
+    display: grid;
+  }
 }
 
 @media (min-width: 640px) {
@@ -476,6 +551,11 @@ select:focus {
   font-weight: 700;
 }
 
+.scenario-table.hide-ratio .col-ratio,
+.scenario-table.hide-ratio td.col-ratio {
+  display: none;
+}
+
 .schedule-table tbody tr.row--grace {
   background: var(--c-subhdr-bg);
 }
@@ -523,96 +603,176 @@ select:focus {
 
 /* ---------------- PDF出力用（html2canvasでスナップショットするオフスクリーン要素） ---------------- */
 .pdf-doc {
-  padding: 28px;
+  padding: 12px 16px 10px;
   color: var(--c-text);
-  font-family: "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-family: "Yu Gothic", "游ゴシック", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  line-height: 1.4;
+  overflow: visible;
+  box-sizing: border-box;
+  width: 720px;
+  background: #ffffff;
+}
+
+.pdf-doc * {
+  overflow: visible;
+}
+
+.pdf-doc__logo {
+  display: block;
+  height: 30px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.pdf-doc__logo--small {
+  height: 28px;
+  max-width: 180px;
+  margin-bottom: 6px;
 }
 
 .pdf-doc__title {
   background: var(--c-title-bg);
   color: var(--c-title-fg);
-  padding: 14px 18px;
-  border-radius: 6px;
-  font-size: 20px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
+  line-height: 1.35;
 }
 
 .pdf-doc__subtitle {
-  font-size: 12px;
+  font-size: 9px;
   color: var(--c-muted);
-  margin-bottom: 18px;
+  margin-bottom: 6px;
 }
 
 .pdf-doc__section-title {
   background: var(--c-header-bg);
   color: var(--c-header-fg);
-  padding: 7px 12px;
-  font-size: 13px;
+  padding: 3px 9px;
+  font-size: 10px;
   font-weight: 700;
-  border-radius: 4px;
-  margin: 18px 0 10px;
+  border-radius: 3px;
+  margin: 6px 0 4px;
+  line-height: 1.4;
+}
+
+.pdf-conditions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: start;
 }
 
 .pdf-condition-table,
-.pdf-schedule-table {
+.pdf-schedule-table,
+.pdf-scenario-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 10px;
+  table-layout: auto;
 }
 
 .pdf-condition-table td {
   border: 1px solid var(--c-border);
-  padding: 8px 10px;
+  padding: 4px 7px;
+  vertical-align: top;
+  line-height: 1.4;
 }
 
 .pdf-condition-table td.label {
   background: var(--c-item-bg);
   font-weight: 700;
-  width: 32%;
+  width: 34%;
+  white-space: nowrap;
 }
 
 .pdf-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 6px;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.pdf-summary-grid--cols-5 {
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .pdf-summary-item {
   border: 1px solid var(--c-border);
-  border-radius: 6px;
-  padding: 10px;
+  border-radius: 4px;
+  padding: 6px 5px;
   text-align: center;
 }
 
 .pdf-summary-item .label {
-  font-size: 11px;
+  font-size: 9px;
   color: var(--c-muted);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
+  line-height: 1.35;
 }
 
 .pdf-summary-item .value {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--c-accent);
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
+.pdf-scenario-table th,
+.pdf-scenario-table td,
 .pdf-schedule-table th,
 .pdf-schedule-table td {
   border: 1px solid var(--c-border);
-  padding: 5px 7px;
+  padding: 4px 6px;
   text-align: right;
+  line-height: 1.35;
+  vertical-align: middle;
 }
 
+.pdf-scenario-table th:first-child,
+.pdf-scenario-table td:first-child,
 .pdf-schedule-table th:first-child,
 .pdf-schedule-table td:first-child {
-  text-align: center;
+  text-align: left;
 }
 
+.pdf-scenario-table thead th,
 .pdf-schedule-table thead th {
   background: var(--c-header-bg);
   color: var(--c-header-fg);
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.pdf-scenario-table tbody tr:nth-child(1) td {
+  font-weight: 700;
+}
+
+.pdf-yearly-table td.year-cell {
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.pdf-yearly-table--compact th,
+.pdf-yearly-table--compact td {
+  padding: 3px 5px;
+  font-size: 9px;
+}
+
+.pdf-yearly-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: start;
 }
 
 .pdf-schedule-table tbody tr.row--grace {
@@ -624,10 +784,39 @@ select:focus {
   font-weight: 700;
 }
 
+.pdf-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.pdf-chart-col .pdf-doc__section-title {
+  margin-top: 6px;
+}
+
+.pdf-chart-wrap {
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  padding: 3px 4px;
+  height: 214px;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.pdf-chart {
+  display: block;
+  width: 100%;
+  height: 206px;
+  object-fit: contain;
+  object-position: center;
+}
+
 .pdf-doc__footer {
-  margin-top: 16px;
-  font-size: 10px;
+  margin-top: 8px;
+  font-size: 9px;
   color: var(--c-muted);
+  line-height: 1.4;
 }
 
 /* ---------------- Footer ---------------- */

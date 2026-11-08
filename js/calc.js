@@ -110,7 +110,7 @@
    * 償還スケジュール（月次の明細配列）を生成する。
    *
    * @param {object} input
-   * @param {number} input.principal 借入金額（物件価格 - 自己資金。呼び出し側で計算して渡す）
+   * @param {number} input.principal 借入金額（取得費用（物件） − 自己資金。呼び出し側で計算して渡す）
    * @param {number} input.annualRatePercent 基本年利(%)
    * @param {number} input.termMonths 返済期間（据置期間を含む総月数）
    * @param {"equalPayment"|"equalPrincipal"} input.repaymentType 返済方式

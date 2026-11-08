@@ -30,6 +30,7 @@
     const repaymentType = document.querySelector('input[name="repaymentType"]:checked').value;
     return {
       propertyPrice: Number(el("propertyPrice").value) || 0,
+      renovationCost: Number(el("renovationCost").value) || 0,
       ownFunds: Number(el("ownFunds").value) || 0,
       annualRate: Number(el("annualRate").value) || 0,
       startMonth: el("startMonth").value || "",
@@ -42,6 +43,7 @@
       prepayments: prepaymentRows.map((r) => ({ month: Number(r.month) || 1, amount: Number(r.amount) || 0, type: r.type })),
       scenarioDelta1: Number(el("scenarioDelta1").value) || 0,
       scenarioDelta2: Number(el("scenarioDelta2").value) || 0,
+      monthlyRent: Number(el("monthlyRent").value) || 0,
     };
   }
 
@@ -57,6 +59,7 @@
     if (!state) return;
     state = migrateLegacyState(state);
     if (state.propertyPrice != null) el("propertyPrice").value = state.propertyPrice;
+    el("renovationCost").value = state.renovationCost ? state.renovationCost : "";
     if (state.ownFunds != null) el("ownFunds").value = state.ownFunds;
     if (state.annualRate != null) el("annualRate").value = state.annualRate;
     if (state.startMonth != null) el("startMonth").value = state.startMonth;
@@ -70,6 +73,7 @@
     el("graceRate").value = state.graceRate == null ? "" : state.graceRate;
     if (state.scenarioDelta1 != null) el("scenarioDelta1").value = state.scenarioDelta1;
     if (state.scenarioDelta2 != null) el("scenarioDelta2").value = state.scenarioDelta2;
+    el("monthlyRent").value = state.monthlyRent ? state.monthlyRent : "";
 
     rateChangeRows = (state.rateChanges || []).map((r) => ({ id: rowIdSeq++, month: r.month, rate: r.annualRatePercent }));
     prepaymentRows = (state.prepayments || []).map((p) => ({ id: rowIdSeq++, month: p.month, amount: p.amount, type: p.type }));
@@ -91,11 +95,11 @@
       div.innerHTML = `
         <label class="field">
           <span class="field__label">何ヶ月目から</span>
-          <input type="number" min="1" step="1" value="${row.month ?? ""}" data-role="month" />
+          <input type="number" inputmode="numeric" min="1" step="1" value="${row.month ?? ""}" data-role="month" />
         </label>
         <label class="field">
-          <span class="field__label">変更後の年利（%）</span>
-          <input type="number" min="0" step="0.01" value="${row.rate ?? ""}" data-role="rate" />
+          <span class="field__label">変更後の年利 <span class="field__unit">%</span></span>
+          <input type="number" inputmode="decimal" min="0" step="0.01" value="${row.rate ?? ""}" data-role="rate" />
         </label>
         <button type="button" class="btn btn--danger" data-role="remove">削除</button>
       `;
@@ -136,11 +140,11 @@
       div.innerHTML = `
         <label class="field">
           <span class="field__label">実行月（何ヶ月目）</span>
-          <input type="number" min="1" step="1" value="${row.month ?? ""}" data-role="month" />
+          <input type="number" inputmode="numeric" min="1" step="1" value="${row.month ?? ""}" data-role="month" />
         </label>
         <label class="field">
-          <span class="field__label">繰上げ額（円）</span>
-          <input type="number" min="0" step="10000" value="${row.amount ?? ""}" data-role="amount" />
+          <span class="field__label">繰上げ額 <span class="field__unit">円</span></span>
+          <input type="number" inputmode="numeric" min="0" step="10000" value="${row.amount ?? ""}" data-role="amount" />
         </label>
         <label class="field">
           <span class="field__label">種別</span>
@@ -179,12 +183,18 @@
   }
 
   // ---------------- 計算入力の組み立て ----------------
+  function acquisitionCostFrom(state) {
+    return (Number(state.propertyPrice) || 0) + (Number(state.renovationCost) || 0);
+  }
+
   function buildCalcInput(state, rateOverridePercent) {
-    const principal = Math.max(state.propertyPrice - state.ownFunds, 0);
+    const acquisitionCost = acquisitionCostFrom(state);
+    const principal = Math.max(acquisitionCost - (Number(state.ownFunds) || 0), 0);
     const termMonths = state.termYears * 12 + state.termMonthsExtra;
     const delta = rateOverridePercent || 0;
 
     return {
+      acquisitionCost,
       principal,
       annualRatePercent: state.annualRate + delta,
       termMonths,
@@ -196,6 +206,17 @@
         .map((r) => ({ month: r.month, annualRatePercent: r.annualRatePercent + delta })),
       prepayments: state.prepayments.filter((p) => p.month >= 1 && p.amount > 0),
     };
+  }
+
+  function annualPaymentFromSummary(summary) {
+    return summary.firstPayment * 12;
+  }
+
+  function repaymentRatio(summary, monthlyRent) {
+    if (!(monthlyRent > 0)) return null;
+    const annualRent = monthlyRent * 12;
+    if (!(annualRent > 0)) return null;
+    return (annualPaymentFromSummary(summary) / annualRent) * 100;
   }
 
   // ---------------- 描画 ----------------
@@ -221,8 +242,12 @@
     if (!isEqualPayment || hasVariability) {
       cards.splice(2, 0, { label: "毎月の返済額（最終回）", value: F.formatYen(summary.lastPayment) });
     }
+    const ratio = repaymentRatio(summary, state.monthlyRent);
+    if (ratio != null) {
+      cards.push({ label: "返済比率", value: F.formatRatio(ratio) });
+    }
 
-    el("summaryGrid").innerHTML = cards
+    const html = cards
       .map(
         (c) => `
         <div class="summary-card">
@@ -232,6 +257,8 @@
       `
       )
       .join("");
+    el("summaryGrid").innerHTML = html;
+    el("summaryGridMobile").innerHTML = html;
   }
 
   function renderScenarioTable(state) {
@@ -240,17 +267,24 @@
       { label: `+${state.scenarioDelta1.toFixed(2)}%上昇`, delta: state.scenarioDelta1 },
       { label: `+${state.scenarioDelta2.toFixed(2)}%上昇`, delta: state.scenarioDelta2 },
     ];
+    const showRatio = state.monthlyRent > 0;
+    const table = el("scenarioTable");
+    table.classList.toggle("hide-ratio", !showRatio);
 
-    const tbody = document.querySelector("#scenarioTable tbody");
+    const tbody = table.querySelector("tbody");
     tbody.innerHTML = scenarios
       .map((s) => {
         const input = buildCalcInput(state, s.delta);
         const { summary } = window.LoanCalc.generateSchedule(input);
+        const annualPay = annualPaymentFromSummary(summary);
+        const ratio = repaymentRatio(summary, state.monthlyRent);
         return `
           <tr>
             <td>${s.label}</td>
             <td>${F.formatPercent(state.annualRate + s.delta)}</td>
             <td>${F.formatYen(summary.firstPayment)}</td>
+            <td>${F.formatYen(annualPay)}</td>
+            <td class="col-ratio">${ratio == null ? "-" : F.formatRatio(ratio)}</td>
             <td>${F.formatYen(summary.totalPayment)}</td>
             <td>${F.formatYen(summary.totalInterest)}</td>
           </tr>
@@ -325,23 +359,35 @@
 
     return {
       propertyPrice: state.propertyPrice,
+      renovationCost: state.renovationCost,
+      acquisitionCost: calcInput.acquisitionCost,
       ownFunds: state.ownFunds,
       principal: calcInput.principal,
       annualRate: state.annualRate,
       termMonths: calcInput.termMonths,
+      repaymentType: state.repaymentType,
       repaymentTypeLabel,
       graceMonths: state.graceMonths,
+      graceAnnualRatePercent: state.graceRate,
       graceRateLabel: state.graceRate == null ? "" : F.formatPercent(state.graceRate),
+      rateChanges: calcInput.rateChanges,
+      prepayments: calcInput.prepayments,
       rateChangeLabels,
       prepaymentLabels,
       startMonth: state.startMonth,
+      monthlyRent: state.monthlyRent,
+      repaymentRatio: repaymentRatio(latestResult.summary, state.monthlyRent),
+      scenarioDelta1: state.scenarioDelta1,
+      scenarioDelta2: state.scenarioDelta2,
+      hasPaymentVariability: calcInput.rateChanges.length > 0 || calcInput.prepayments.some((p) => p.type === "reducePayment"),
     };
   }
 
   function renderLoanAmountReadout(state, calcInput) {
+    el("acquisitionCostReadoutValue").textContent = F.formatYen(calcInput.acquisitionCost);
     el("loanAmountReadoutValue").textContent = F.formatYen(calcInput.principal);
     const warning = el("loanAmountWarning");
-    const exceeds = state.ownFunds > state.propertyPrice && state.propertyPrice >= 0;
+    const exceeds = state.ownFunds > calcInput.acquisitionCost && calcInput.acquisitionCost >= 0;
     warning.hidden = !exceeds;
   }
 
@@ -371,6 +417,7 @@
   function wireEvents() {
     const inputIds = [
       "propertyPrice",
+      "renovationCost",
       "ownFunds",
       "annualRate",
       "startMonth",
@@ -380,6 +427,7 @@
       "graceRate",
       "scenarioDelta1",
       "scenarioDelta2",
+      "monthlyRent",
     ];
     inputIds.forEach((id) => el(id).addEventListener("input", scheduleRecalc));
     document.querySelectorAll('input[name="repaymentType"]').forEach((r) => r.addEventListener("change", scheduleRecalc));

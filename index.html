@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>ローンシミュレーター | 事業融資返済プラン</title>
-<meta name="description" content="事業融資向けのローン返済シミュレーター。元利均等・元金均等、据置期間、繰り上げ返済、金利変更に対応し、償還表をPDFで出力できます。" />
+<title>バナローン | 事業融資の返済シミュレーター</title>
+<meta name="description" content="バナローンは事業融資向けの返済シミュレーターです。元利均等・元金均等、据置期間、繰り上げ返済、金利変更、返済比率の比較に対応し、償還表をPDFで出力できます。" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 <header class="app-header">
   <div class="app-header__inner">
-    <h1 class="app-header__title">ローンシミュレーター</h1>
+    <h1 class="app-header__title">
+      <img src="assets/bana-loan-logo.jpg" alt="バナローン" class="app-header__logo" width="1024" height="341" />
+    </h1>
     <p class="app-header__subtitle">事業融資の返済プランを、スマホでもPCでも簡単に試算</p>
   </div>
 </header>
@@ -24,45 +26,63 @@
 
       <div class="field-row">
         <label class="field">
-          <span class="field__label">物件価格（円）</span>
-          <input type="number" id="propertyPrice" inputmode="numeric" min="0" step="10000" value="30000000" />
+          <span class="field__label">物件価格 <span class="field__unit">円</span></span>
+          <input type="number" id="propertyPrice" inputmode="numeric" enterkeyhint="next" min="0" step="10000" value="30000000" />
         </label>
         <label class="field">
-          <span class="field__label">自己資金（円）</span>
-          <input type="number" id="ownFunds" inputmode="numeric" min="0" step="10000" value="0" />
+          <span class="field__label">リフォーム費用 <span class="field__unit">円・任意</span></span>
+          <input type="number" id="renovationCost" inputmode="numeric" enterkeyhint="next" min="0" step="10000" value="" placeholder="未入力なら0円" />
+        </label>
+        <label class="field">
+          <span class="field__label">自己資金 <span class="field__unit">円</span></span>
+          <input type="number" id="ownFunds" inputmode="numeric" enterkeyhint="next" min="0" step="10000" value="0" />
         </label>
       </div>
 
       <div class="loan-amount-readout" id="loanAmountReadout">
-        <div class="loan-amount-readout__text">
-          <span class="loan-amount-readout__label">借入金額</span>
-          <span class="loan-amount-readout__formula">物件価格 − 自己資金</span>
+        <div class="loan-amount-readout__row">
+          <div class="loan-amount-readout__text">
+            <span class="loan-amount-readout__label">取得費用（物件）</span>
+            <span class="loan-amount-readout__formula">物件価格 + リフォーム費用</span>
+          </div>
+          <span class="loan-amount-readout__value" id="acquisitionCostReadoutValue">30,000,000円</span>
         </div>
-        <span class="loan-amount-readout__value" id="loanAmountReadoutValue">30,000,000円</span>
+        <div class="loan-amount-readout__row">
+          <div class="loan-amount-readout__text">
+            <span class="loan-amount-readout__label">借入金額</span>
+            <span class="loan-amount-readout__formula">取得費用（物件） − 自己資金</span>
+          </div>
+          <span class="loan-amount-readout__value" id="loanAmountReadoutValue">30,000,000円</span>
+        </div>
       </div>
-      <p id="loanAmountWarning" class="field-warning" hidden>自己資金が物件価格を超えているため、借入金額は0円です。</p>
+      <p id="loanAmountWarning" class="field-warning" hidden>自己資金が取得費用（物件）を超えているため、借入金額は0円です。</p>
 
       <div class="field-row">
         <label class="field">
-          <span class="field__label">年利（%）</span>
-          <input type="number" id="annualRate" inputmode="decimal" min="0" step="0.01" value="1.50" />
+          <span class="field__label">年利 <span class="field__unit">%</span></span>
+          <input type="number" id="annualRate" inputmode="decimal" enterkeyhint="next" min="0" step="0.01" value="1.50" />
         </label>
         <label class="field">
-          <span class="field__label">借入開始年月（任意）</span>
+          <span class="field__label">借入開始年月 <span class="field__unit">任意</span></span>
           <input type="month" id="startMonth" />
         </label>
       </div>
 
       <div class="field-row">
         <label class="field">
-          <span class="field__label">返済期間（年）</span>
-          <input type="number" id="termYears" inputmode="numeric" min="0" step="1" value="30" />
+          <span class="field__label">返済期間 <span class="field__unit">年</span></span>
+          <input type="number" id="termYears" inputmode="numeric" enterkeyhint="next" min="0" step="1" value="30" />
         </label>
         <label class="field">
-          <span class="field__label">返済期間（月・端数）</span>
-          <input type="number" id="termMonthsExtra" inputmode="numeric" min="0" max="11" step="1" value="0" />
+          <span class="field__label">返済期間（端数） <span class="field__unit">月</span></span>
+          <input type="number" id="termMonthsExtra" inputmode="numeric" enterkeyhint="next" min="0" max="11" step="1" value="0" />
         </label>
       </div>
+
+      <label class="field">
+        <span class="field__label">月額家賃収入 <span class="field__unit">円・任意</span></span>
+        <input type="number" id="monthlyRent" inputmode="numeric" enterkeyhint="done" min="0" step="1000" value="" placeholder="未入力なら返済比率は非表示" />
+      </label>
 
       <div class="field">
         <span class="field__label">返済方式</span>
@@ -79,16 +99,18 @@
       </div>
     </div>
 
+    <div class="summary-grid summary-grid--near-input" id="summaryGridMobile"></div>
+
     <details class="card card--collapsible">
       <summary class="card__title">元金据置期間（任意）</summary>
       <p class="card__hint">建築中など、元金を返済せず利息のみを支払う期間を設定できます。</p>
       <div class="field-row">
         <label class="field">
-          <span class="field__label">据置期間（月）</span>
+          <span class="field__label">据置期間 <span class="field__unit">月</span></span>
           <input type="number" id="graceMonths" inputmode="numeric" min="0" step="1" value="0" />
         </label>
         <label class="field">
-          <span class="field__label">据置中の年利（%・空欄で基本金利と同じ）</span>
+          <span class="field__label">据置中の年利 <span class="field__unit">%・空欄で基本金利と同じ</span></span>
           <input type="number" id="graceRate" inputmode="decimal" min="0" step="0.01" placeholder="基本金利と同じ" />
         </label>
       </div>
@@ -110,7 +132,7 @@
 
     <div class="action-row">
       <button type="button" id="copyShareLink" class="btn btn--secondary">共有用リンクをコピー</button>
-      <button type="button" id="exportPdf" class="btn btn--primary">償還表をPDFで保存</button>
+      <button type="button" id="exportPdf" class="btn btn--primary">結果をPDFで保存</button>
     </div>
     <p id="shareStatus" class="status-text" role="status" aria-live="polite"></p>
   </section>
@@ -118,7 +140,7 @@
   <!-- ============ 結果パネル ============ -->
   <section class="panel panel--result" aria-label="計算結果">
 
-    <div class="summary-grid" id="summaryGrid">
+    <div class="summary-grid summary-grid--result" id="summaryGrid">
       <!-- JSで生成 -->
     </div>
 
@@ -127,11 +149,11 @@
       <p class="card__hint">現在の入力条件をベースに、金利が上昇した場合の影響を比較します。</p>
       <div class="field-row field-row--compact">
         <label class="field">
-          <span class="field__label">比較シナリオ1（現在の金利 + %）</span>
+          <span class="field__label">比較シナリオ1 <span class="field__unit">現在の金利 + %</span></span>
           <input type="number" id="scenarioDelta1" inputmode="decimal" min="0" step="0.1" value="1.0" />
         </label>
         <label class="field">
-          <span class="field__label">比較シナリオ2（現在の金利 + %）</span>
+          <span class="field__label">比較シナリオ2 <span class="field__unit">現在の金利 + %</span></span>
           <input type="number" id="scenarioDelta2" inputmode="decimal" min="0" step="0.1" value="2.0" />
         </label>
       </div>
@@ -140,8 +162,10 @@
           <thead>
             <tr>
               <th>シナリオ</th>
-              <th>年利</th>
-              <th>毎月返済額（初回）</th>
+              <th>金利</th>
+              <th>月額返済額</th>
+              <th>年間返済額</th>
+              <th class="col-ratio">返済比率</th>
               <th>総返済額</th>
               <th>総利息</th>
             </tr>

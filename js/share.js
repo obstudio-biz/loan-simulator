@@ -10,6 +10,7 @@
 
   const QUERY_KEY_MAP = {
     propertyPrice: "pr",
+    renovationCost: "rf",
     ownFunds: "of",
     annualRate: "ar",
     startMonth: "sm",
@@ -22,6 +23,7 @@
     prepayments: "pp",
     scenarioDelta1: "d1",
     scenarioDelta2: "d2",
+    monthlyRent: "mr",
   };
 
   function saveState(state) {
