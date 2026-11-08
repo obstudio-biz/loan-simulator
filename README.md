@@ -70,7 +70,7 @@ GitHubアカウントの操作が不要な、ドラッグ&ドロップだけの�
 ```
 loan_simulator/
   index.html          画面本体（入力フォーム・結果表示エリア）
-  assets/bana-loan-logo.jpg  バナローンのロゴ
+  assets/bana-loan-logo.png  バナローンのロゴ
   css/style.css        OfficeBananaカラーのレスポンシブスタイル
   js/calc.js           元利均等・元金均等・据置・繰り上げ返済・金利変更の計算ロジック（純粋関数）
   js/calc.test.manual.js  calc.jsの手動検証スクリプト（Node.jsがあれば `node js/calc.test.manual.js` で実行可）

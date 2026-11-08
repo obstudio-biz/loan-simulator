@@ -12,7 +12,7 @@
   <div class="app-header__inner">
     <h1 class="app-header__title">
       <button type="button" id="resetToDefaults" class="app-header__logo-btn" title="入力をクリアして初期状態に戻す" aria-label="バナローン。入力をクリアして初期状態に戻す">
-        <img src="assets/bana-loan-logo.jpg" alt="" class="app-header__logo" width="1024" height="341" />
+        <img src="assets/bana-loan-logo.png" alt="" class="app-header__logo" width="1024" height="341" />
       </button>
     </h1>
     <p class="app-header__subtitle">事業融資の返済プランを、スマホでもPCでも簡単に試算</p>
@@ -149,14 +149,18 @@
     <div class="card">
       <h2 class="card__title">金利上昇シナリオ比較</h2>
       <p class="card__hint">現在の入力条件をベースに、金利が上昇した場合の影響を比較します。</p>
-      <div class="field-row field-row--compact">
+      <div class="field-row field-row--compact field-row--scenarios">
         <label class="field">
           <span class="field__label">比較シナリオ1 <span class="field__unit">現在の金利 + %</span></span>
-          <input type="number" id="scenarioDelta1" inputmode="decimal" min="0" step="0.1" value="1.0" />
+          <input type="number" id="scenarioDelta1" inputmode="decimal" min="0" step="0.1" value="0.5" />
         </label>
         <label class="field">
           <span class="field__label">比較シナリオ2 <span class="field__unit">現在の金利 + %</span></span>
-          <input type="number" id="scenarioDelta2" inputmode="decimal" min="0" step="0.1" value="2.0" />
+          <input type="number" id="scenarioDelta2" inputmode="decimal" min="0" step="0.1" value="1.0" />
+        </label>
+        <label class="field">
+          <span class="field__label">比較シナリオ3 <span class="field__unit">現在の金利 + %</span></span>
+          <input type="number" id="scenarioDelta3" inputmode="decimal" min="0" step="0.1" value="2.0" />
         </label>
       </div>
       <div class="table-scroll">

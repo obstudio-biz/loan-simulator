@@ -30,7 +30,7 @@
   }
 
   function logoSrc() {
-    return new URL("assets/bana-loan-logo.jpg", global.location.href).href;
+    return new URL("assets/bana-loan-logo.png", global.location.href).href;
   }
 
   function conditionTable(rows) {
@@ -141,10 +141,12 @@
   function buildScenarioRows(input) {
     const d1 = Number(input.scenarioDelta1);
     const d2 = Number(input.scenarioDelta2);
+    const d3 = Number(input.scenarioDelta3);
     const scenarios = [
       { label: "現在の金利", delta: 0 },
       { label: `+${(Number.isFinite(d1) ? d1 : 0).toFixed(2)}%上昇`, delta: Number.isFinite(d1) ? d1 : 0 },
       { label: `+${(Number.isFinite(d2) ? d2 : 0).toFixed(2)}%上昇`, delta: Number.isFinite(d2) ? d2 : 0 },
+      { label: `+${(Number.isFinite(d3) ? d3 : 0).toFixed(2)}%上昇`, delta: Number.isFinite(d3) ? d3 : 0 },
     ];
     return scenarios.map((s) => {
       const { summary } = global.LoanCalc.generateSchedule(buildScenarioCalcInput(input, s.delta));

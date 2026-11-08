@@ -32,6 +32,7 @@ html,
 body {
   margin: 0;
   padding: 0;
+  max-width: 100%;
 }
 
 body {
@@ -47,21 +48,24 @@ h1, h2, h3 {
 
 /* ---------------- Header ---------------- */
 .app-header {
-  background: #ffffff;
+  background: var(--c-bg);
   color: var(--c-text);
-  padding: 14px 16px 16px;
-  border-bottom: 1px solid var(--c-border);
+  padding: 12px 16px 14px;
+  border-bottom: none;
 }
 
 .app-header__inner {
   max-width: 1200px;
   margin: 0 auto;
+  min-width: 0;
 }
 
 .app-header__title {
   display: flex;
   align-items: center;
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .app-header__logo-btn {
@@ -73,6 +77,8 @@ h1, h2, h3 {
   display: block;
   line-height: 0;
   border-radius: 4px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .app-header__logo-btn:focus-visible {
@@ -82,9 +88,10 @@ h1, h2, h3 {
 
 .app-header__logo {
   display: block;
-  height: 56px;
   width: auto;
-  max-width: min(360px, 88vw);
+  height: auto;
+  max-width: 100%;
+  max-height: 48px;
   object-fit: contain;
 }
 
@@ -99,7 +106,7 @@ h1, h2, h3 {
     padding: 18px 24px 20px;
   }
   .app-header__logo {
-    height: 72px;
+    max-height: 72px;
     max-width: 460px;
   }
 }
@@ -112,6 +119,12 @@ h1, h2, h3 {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  min-width: 0;
+  width: 100%;
+}
+
+.layout > * {
+  min-width: 0;
 }
 
 @media (min-width: 960px) {
@@ -131,6 +144,8 @@ h1, h2, h3 {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* ---------------- Card ---------------- */
@@ -140,6 +155,8 @@ h1, h2, h3 {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .card--collapsible summary {
@@ -176,6 +193,8 @@ h1, h2, h3 {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
+  min-width: 0;
+  gap: 8px;
 }
 
 .card__title-row .card__title {
@@ -194,6 +213,7 @@ h1, h2, h3 {
   grid-template-columns: 1fr;
   gap: 10px;
   margin-bottom: 12px;
+  min-width: 0;
 }
 
 .field-row--compact {
@@ -205,11 +225,8 @@ h1, h2, h3 {
   .panel--result .field-row {
     grid-template-columns: 1fr 1fr;
   }
-}
-
-@media (max-width: 959px) {
-  .field__label {
-    font-size: 0.9rem;
+  .panel--result .field-row--scenarios {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
@@ -253,6 +270,8 @@ select {
   font-size: 1rem;
   color: var(--c-text);
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   font-family: inherit;
   min-height: 48px;
 }
@@ -311,6 +330,8 @@ select:focus {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--c-accent);
+  min-width: 0;
+  word-break: break-word;
 }
 
 .field-warning {
@@ -325,10 +346,13 @@ select:focus {
   border: 1px solid var(--c-border);
   border-radius: 8px;
   overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .segmented__option {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   text-align: center;
   padding: 14px 6px;
   font-size: 0.9rem;
@@ -407,11 +431,13 @@ select:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .action-row .btn {
-  flex: 1;
-  min-width: 160px;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .status-text {
@@ -475,6 +501,8 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .summary-grid.summary-grid--result {
@@ -507,6 +535,7 @@ select:focus {
   box-shadow: var(--shadow);
   padding: 14px;
   text-align: center;
+  min-width: 0;
 }
 
 .summary-card__label {
@@ -529,6 +558,11 @@ select:focus {
 /* ---------------- Scenario comparison table ---------------- */
 .table-scroll {
   overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
 .scenario-table,
@@ -587,6 +621,8 @@ select:focus {
   border-radius: 8px;
   margin-bottom: 10px;
   overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .year-group summary {
@@ -599,6 +635,7 @@ select:focus {
   display: flex;
   justify-content: space-between;
   gap: 8px;
+  min-width: 0;
 }
 
 .year-group summary::-webkit-details-marker {
@@ -609,12 +646,91 @@ select:focus {
   color: var(--c-muted);
   font-weight: 400;
   font-size: 0.78rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---------------- Chart ---------------- */
 .chart-wrap {
   position: relative;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 220px;
+}
+
+.chart-wrap canvas {
+  display: block;
+  max-width: 100%;
+}
+
+@media (max-width: 959px) {
+  .app-header {
+    padding: 10px 12px 12px;
+  }
+  .app-header__subtitle {
+    font-size: 0.8rem;
+  }
+  .layout {
+    padding: 12px;
+    gap: 12px;
+  }
+  .panel {
+    gap: 12px;
+  }
+  .card {
+    padding: 12px;
+  }
+  .card__title {
+    font-size: 0.95rem;
+  }
+  .field__label {
+    font-size: 0.86rem;
+  }
+  .field {
+    margin-bottom: 10px;
+  }
+  .field-row {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  input[type="number"],
+  input[type="text"],
+  input[type="month"],
+  select {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+  .segmented__option {
+    min-height: 44px;
+    padding: 10px 6px;
+    font-size: 0.85rem;
+  }
+  .btn {
+    min-height: 44px;
+    padding: 12px 12px;
+    font-size: 0.9rem;
+  }
+  .action-row {
+    gap: 8px;
+  }
+  .summary-grid {
+    gap: 8px;
+  }
+  .summary-card {
+    padding: 10px;
+  }
+  .summary-card__value {
+    font-size: 1.02rem;
+  }
+  .loan-amount-readout {
+    padding: 8px 10px;
+  }
+  .app-footer {
+    padding: 16px 12px 28px;
+  }
 }
 
 /* ---------------- PDF出力用（html2canvasでスナップショットするオフスクリーン要素） ---------------- */

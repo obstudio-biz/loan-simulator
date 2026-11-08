@@ -43,6 +43,7 @@
       prepayments: prepaymentRows.map((r) => ({ month: Number(r.month) || 1, amount: Number(r.amount) || 0, type: r.type })),
       scenarioDelta1: Number(el("scenarioDelta1").value) || 0,
       scenarioDelta2: Number(el("scenarioDelta2").value) || 0,
+      scenarioDelta3: Number(el("scenarioDelta3").value) || 0,
       monthlyRent: Number(el("monthlyRent").value) || 0,
     };
   }
@@ -73,6 +74,7 @@
     el("graceRate").value = state.graceRate == null ? "" : state.graceRate;
     if (state.scenarioDelta1 != null) el("scenarioDelta1").value = state.scenarioDelta1;
     if (state.scenarioDelta2 != null) el("scenarioDelta2").value = state.scenarioDelta2;
+    if (state.scenarioDelta3 != null) el("scenarioDelta3").value = state.scenarioDelta3;
     el("monthlyRent").value = state.monthlyRent ? state.monthlyRent : "";
 
     rateChangeRows = (state.rateChanges || []).map((r) => ({ id: rowIdSeq++, month: r.month, rate: r.annualRatePercent }));
@@ -266,6 +268,7 @@
       { label: "現在の金利", delta: 0 },
       { label: `+${state.scenarioDelta1.toFixed(2)}%上昇`, delta: state.scenarioDelta1 },
       { label: `+${state.scenarioDelta2.toFixed(2)}%上昇`, delta: state.scenarioDelta2 },
+      { label: `+${state.scenarioDelta3.toFixed(2)}%上昇`, delta: state.scenarioDelta3 },
     ];
     const showRatio = state.monthlyRent > 0;
     const table = el("scenarioTable");
@@ -379,6 +382,7 @@
       repaymentRatio: repaymentRatio(latestResult.summary, state.monthlyRent),
       scenarioDelta1: state.scenarioDelta1,
       scenarioDelta2: state.scenarioDelta2,
+      scenarioDelta3: state.scenarioDelta3,
       hasPaymentVariability: calcInput.rateChanges.length > 0 || calcInput.prepayments.some((p) => p.type === "reducePayment"),
     };
   }
@@ -427,6 +431,7 @@
       "graceRate",
       "scenarioDelta1",
       "scenarioDelta2",
+      "scenarioDelta3",
       "monthlyRent",
     ];
     inputIds.forEach((id) => el(id).addEventListener("input", scheduleRecalc));
@@ -486,6 +491,7 @@
       "graceRate",
       "scenarioDelta1",
       "scenarioDelta2",
+      "scenarioDelta3",
       "monthlyRent",
     ];
     ids.forEach((id) => {

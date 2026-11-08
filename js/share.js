@@ -23,6 +23,7 @@
     prepayments: "pp",
     scenarioDelta1: "d1",
     scenarioDelta2: "d2",
+    scenarioDelta3: "d3",
     monthlyRent: "mr",
   };
 
