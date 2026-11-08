@@ -6,7 +6,7 @@
 (function (global) {
   "use strict";
 
-  const STORAGE_KEY = "loanSimulator.state.v1";
+  const STORAGE_KEY = "loanSimulator.state.v2";
 
   const QUERY_KEY_MAP = {
     propertyPrice: "pr",
